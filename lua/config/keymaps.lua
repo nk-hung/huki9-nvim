@@ -2,6 +2,7 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
+local Util = require("lazyvim.util")
 local keymap = vim.keymap
 local opts = { noremap = true, silent = true }
 
@@ -43,3 +44,9 @@ keymap.set("n", "<C-w><down>", "<C-w>-")
 keymap.set("n", "<C-j>", function()
   vim.diagnostic.goto_next()
 end, opts)
+
+if Util.has("gitsigns.nvim") then
+  keymap("n", "<leader>ub", "<cmd>lua require('gitsigns').toggle_current_line_blame()<CR>", {
+    desc = "Toggle current line blame",
+  })
+end
