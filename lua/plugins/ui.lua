@@ -1,57 +1,57 @@
 return {
   -- messages, cmdline and the popupmenu
-  {
-    "folke/noice.nvim",
-    opts = function(_, opts)
-      table.insert(opts.routes, {
-        filter = {
-          event = "notify",
-          find = "No information available",
-        },
-        opts = { skip = true, background_colour = "#000000" },
-      })
-      local focused = true
-      vim.api.nvim_create_autocmd("FocusGained", {
-        callback = function()
-          focused = true
-        end,
-      })
-      vim.api.nvim_create_autocmd("FocusLost", {
-        callback = function()
-          focused = false
-        end,
-      })
-      table.insert(opts.routes, 1, {
-        filter = {
-          cond = function()
-            return not focused
-          end,
-        },
-        view = "notify_send",
-        opts = { stop = false, background_colour = "#000000" },
-      })
-
-      opts.commands = {
-        all = {
-          -- options for the message history that you get with `:Noice`
-          view = "split",
-          opts = { enter = true, format = "details" },
-          filter = {},
-        },
-      }
-
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "markdown",
-        callback = function(event)
-          vim.schedule(function()
-            require("noice.text.markdown").keys(event.buf)
-          end)
-        end,
-      })
-
-      opts.presets.lsp_doc_border = true
-    end,
-  },
+  -- {
+  --   "folke/noice.nvim",
+  --   opts = function(_, opts)
+  --     table.insert(opts.routes, {
+  --       filter = {
+  --         event = "notify",
+  --         find = "No information available",
+  --       },
+  --       opts = { skip = true, background_colour = "#000000" },
+  --     })
+  --     local focused = true
+  --     vim.api.nvim_create_autocmd("FocusGained", {
+  --       callback = function()
+  --         focused = true
+  --       end,
+  --     })
+  --     vim.api.nvim_create_autocmd("FocusLost", {
+  --       callback = function()
+  --         focused = false
+  --       end,
+  --     })
+  --     table.insert(opts.routes, 1, {
+  --       filter = {
+  --         cond = function()
+  --           return not focused
+  --         end,
+  --       },
+  --       view = "notify_send",
+  --       opts = { stop = false, background_colour = "#000000" },
+  --     })
+  --
+  --     opts.commands = {
+  --       all = {
+  --         -- options for the message history that you get with `:Noice`
+  --         view = "split",
+  --         opts = { enter = true, format = "details" },
+  --         filter = {},
+  --       },
+  --     }
+  --
+  --     vim.api.nvim_create_autocmd("FileType", {
+  --       pattern = "markdown",
+  --       callback = function(event)
+  --         vim.schedule(function()
+  --           require("noice.text.markdown").keys(event.buf)
+  --         end)
+  --       end,
+  --     })
+  --
+  --     opts.presets.lsp_doc_border = true
+  --   end,
+  -- },
 
   -- animations
   {
@@ -89,7 +89,7 @@ return {
     opts = {
       options = {
         -- globalstatus = false,
-        theme = "catppuccin/nvim",
+        theme = "solarized_dark",
       },
     },
   },
@@ -154,6 +154,32 @@ return {
 
       logo = string.rep("\n", 8) .. logo .. "\n\n"
       opts.config.header = vim.split(logo, "\n")
+    end,
+  },
+
+  {
+    "rcarriga/nvim-dap-ui",
+  -- stylua: ignore
+  keys = {
+    { "<leader>du", function() require("dapui").toggle({ }) end, desc = "Dap UI" },
+    { "<leader>de", function() require("dapui").eval() end, desc = "Eval", mode = {"n", "v"} },
+  },
+    opts = {},
+    config = function(_, opts)
+      -- setup dap config by VsCode launch.json file
+      -- require("dap.ext.vscode").load_launchjs()
+      local dap = require("dap")
+      local dapui = require("dapui")
+      dapui.setup(opts)
+      dap.listeners.after.event_initialized["dapui_config"] = function()
+        dapui.open({})
+      end
+      dap.listeners.before.event_terminated["dapui_config"] = function()
+        dapui.close({})
+      end
+      dap.listeners.before.event_exited["dapui_config"] = function()
+        dapui.close({})
+      end
     end,
   },
 }
